@@ -13,3 +13,7 @@ class CodefyTestCase(unittest.TestCase):
     def test_decode_id_with_two_digits(self):
         result = decode('k1')
         self.assertEquals(82, result)
+
+
+if __name__ == '__main__':
+    unittest.main()
