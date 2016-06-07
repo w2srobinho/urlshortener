@@ -1,5 +1,5 @@
 from . import db
-from .codefy import decode
+from .codefy import decode, encode
 from .models import Url, User
 
 
@@ -19,7 +19,7 @@ def find_url(hash_code):
     return url.address
 
 
-def add_url(userid, url):
+def add_url(userid, url, host):
     """
     Insert url on database with userid (name from owner)
     :param userid: name from owner
@@ -36,7 +36,8 @@ def add_url(userid, url):
     return {
         'id': url.id,
         'hits': url.hits,
-        'url': url.address
+        'url': url.address,
+        'shortUrl': '{}/{}'.format(host, encode(url.id))
     }
 
 
@@ -52,3 +53,26 @@ def add_user(userid):
     db.session.add(user)
     db.session.commit()
     return {'id': user.name}
+
+
+def generate_global_statistics(host):
+    """
+    Generate state of all system
+    :return: a dictionary with the global statistics
+    """
+    urls = Url.query.order_by(Url.hits.desc()).all()
+    total_hits = sum(url.hits for url in urls)  # sum all hits
+    # Generate a list with top10 using python list comprehensions
+    top10 = [
+        {
+            'id': url.id,
+            'hits': url.hits,
+            'url': url.address,
+            'shortUrl': '{}/{}'.format(host, encode(url.id))
+        }
+        for url in urls[:10]
+        ]
+
+    return {'hits': total_hits,
+            'urlCount': len(urls),
+            'topUrls': top10}
