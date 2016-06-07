@@ -17,8 +17,3 @@ class Url(db.Model):
     hits = db.Column(db.Integer)
     address = db.Column(db.String(200))
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-    def __init__(self, address, owner, hits=0):
-        self.address = address
-        self.owner_id = owner
-        self.hits = hits
