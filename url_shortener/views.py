@@ -1,6 +1,20 @@
-from flask import abort, jsonify, make_response, request
+from flask import abort, jsonify, make_response, redirect, request
 from . import app, db_manager
 from .codefy import encode
+
+
+@app.route('/urls/<id>', methods=['GET'])
+def get_url(id):
+    """
+    Endpoint to add url
+    :param id: the url code
+    :return: 301, redirect to url found
+             401, if url not found
+    """
+    url_found = db_manager.find_url(id)
+    if not url_found:
+        abort(404)
+    return redirect(url_found, code=301)
 
 
 @app.route('/users/<userid>/urls', methods=['POST'])

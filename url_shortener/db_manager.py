@@ -1,5 +1,22 @@
 from . import db
+from .codefy import decode
 from .models import Url, User
+
+
+def find_url(hash_code):
+    """
+    Find url on database, decode hash_code using decode function to take the id
+    :param hash_code: the encoded code of url
+    :return: the url address, if found in database
+             None otherwise
+    """
+    id = decode(hash_code)
+    url = Url.query.filter_by(id=id).first()
+    if not url:
+        return None
+    url.hits += 1
+    db.session.commit()
+    return url.address
 
 
 def add_url(userid, url):
