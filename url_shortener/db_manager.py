@@ -127,12 +127,28 @@ def remove_url(hash_code):
     """
     Remove a specific url by id
     :param hash_code: encoded id from url
-    :return: None, if there some error
+    :return: True, if url was removed
+             None, if there some error
     """
     id = decode(hash_code)
     url = Url.query.filter_by(id=id).first()
     if not url:
         return None
     db.session.delete(url)
+    db.session.commit()
+    return True
+
+
+def remove_user(user_id):
+    """
+    Remove a specific user with user_name
+    :param user_id: name from user
+    :return: True, if user was removed
+             None, if there some error
+    """
+    user_found = User.query.filter_by(name=user_id).first()
+    if not user_found:
+        return None
+    db.session.delete(user_found)
     db.session.commit()
     return True

@@ -145,3 +145,15 @@ def add_user():
     if not obj_created:
         abort(409)
     return make_response(jsonify(obj_created), 201)
+
+
+@app.route('/users/<user_id>', methods=['DELETE'])
+def remove_user(user_id):
+    """
+    Endpoint to remove user
+    :param user_id: name from user
+    """
+    status = db_manager.remove_user(user_id)
+    if not status:
+        abort(404)
+    return ''
