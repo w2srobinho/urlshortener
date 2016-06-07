@@ -7,7 +7,7 @@ VIRTUALENV_ROOT="$APPDIR/env"
 if [ -z "$VIRTUALENV" ]; then
     echo "Installing Python3.5"    
     apt-get update
-    apt-get install python3.5
+    apt-get install python3.5 -y
     VIRTUALENV=`which pyvenv`
 fi
 
