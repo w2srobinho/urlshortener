@@ -104,3 +104,35 @@ def generate_global_statistics(host):
     urls = Url.query.order_by(Url.hits.desc()).all()
     return _generate_statistics(urls, host)
 
+
+def generate_url_statistics(hash_code, host):
+    """
+    Generate statistics for a specific url
+    :param host: name of host from server
+    :return: a dictionary with the specific url statistics
+    """
+    id = decode(hash_code)
+    url = Url.query.filter_by(id=id).first()
+    if not url:
+        return None
+    return {
+        "id": url.id,
+        "hits": url.hits,
+        "url": url.address,
+        "shortUrl": encode(url.id)
+    }
+
+
+def remove_url(hash_code):
+    """
+    Remove a specific url by id
+    :param hash_code: encoded id from url
+    :return: None, if there some error
+    """
+    id = decode(hash_code)
+    url = Url.query.filter_by(id=id).first()
+    if not url:
+        return None
+    db.session.delete(url)
+    db.session.commit()
+    return True

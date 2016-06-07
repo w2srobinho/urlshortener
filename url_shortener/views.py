@@ -71,6 +71,7 @@ def global_stats():
 def user_stats(user_id):
     """
     Endpoint to generate user statistics url
+    :param user_id: name from owner
     :return: 404, user not found  or
              200, json with the user stats
                  ex. {
@@ -99,6 +100,37 @@ def user_stats(user_id):
         abort(404)
     return make_response(jsonify(stats), 200)
 
+
+@app.route('/stats/<id>', methods=['GET'])
+def url_stats(id):
+    """
+    Endpoint to generate url statistics
+    :param user_id: encoded id from url
+    :return: 404, user not found  or
+             200, json with the user stats
+                 ex. {
+                        "id": "23094",
+                        "hits": 0,
+                        "url": "http://www.google.com.br",
+                        "shortUrl": "http://<host>[:<port>]/asdfeiba"
+                    }
+    """
+    stats = db_manager.generate_url_statistics(id, request.host)
+    if not stats:
+        abort(404)
+    return make_response(jsonify(stats), 200)
+
+
+@app.route('/urls/<id>', methods=['DELETE'])
+def remove_url(id):
+    """
+    Endpoint to remove url
+    :param id: encoded id from url
+    """
+    status = db_manager.remove_url(id)
+    if not status:
+        abort(404)
+    return ''
 
 @app.route('/users', methods=['POST'])
 def add_user():
