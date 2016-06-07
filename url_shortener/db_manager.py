@@ -19,15 +19,15 @@ def find_url(hash_code):
     return url.address
 
 
-def add_url(userid, url, host):
+def add_url(user_id, url, host):
     """
-    Insert url on database with userid (name from owner)
-    :param userid: name from owner
+    Insert url on database with user_id (name from owner)
+    :param user_id: name from owner
     :param url: the address to add
     :return: True, if url added
              None otherwise
     """
-    user = User.query.filter_by(name=userid).first()
+    user = User.query.filter_by(name=user_id).first()
     if not user:
         return None
     url = Url(address=url, owner=user, hits=0)
@@ -41,38 +41,66 @@ def add_url(userid, url, host):
     }
 
 
-def add_user(userid):
+def add_user(user_id):
     """
-    Insert user on database, userid is the name from user
-    :param userid: name from user
+    Insert user on database, user_id is the name from user
+    :param user_id: name from user
     """
-    user_found = User.query.filter_by(name=userid).first()
+    user_found = User.query.filter_by(name=user_id).first()
     if user_found:
         return None
-    user = User(name=userid)
+    user = User(name=user_id)
     db.session.add(user)
     db.session.commit()
     return {'id': user.name}
 
 
-def generate_global_statistics(host):
+def _generate_statistics(urls, host):
     """
-    Generate state of all system
-    :return: a dictionary with the global statistics
+    Generate statistics of system
+    :param urls: list of urls to generate the statistics
+    :host: name of host from server
+    :return: a dictionary with the statistics
     """
-    urls = Url.query.order_by(Url.hits.desc()).all()
     total_hits = sum(url.hits for url in urls)  # sum all hits
     # Generate a list with top10 using python list comprehensions
     top10 = [
-        {
-            'id': url.id,
-            'hits': url.hits,
-            'url': url.address,
-            'shortUrl': '{}/{}'.format(host, encode(url.id))
-        }
-        for url in urls[:10]
+            {
+                'id': url.id,
+                'hits': url.hits,
+                'url': url.address,
+                'shortUrl': '{}/{}'.format(host, encode(url.id))
+            }
+            for url in urls[:10]
         ]
 
-    return {'hits': total_hits,
-            'urlCount': len(urls),
-            'topUrls': top10}
+    return {
+        'hits': total_hits,
+        'urlCount': len(urls),
+        'topUrls': top10
+    }
+
+
+def generate_user_statistics(user_id, host):
+    """
+    Generate statistics for a specific user
+    :param user_id:
+    :param host: name of host from server
+    :return: a dictionary with the user statistics
+    """
+    user_found = User.query.filter_by(name=user_id).first()
+    if not user_found:
+        return None
+    urls = Url.query.filter_by(owner_id=user_found.id).all()
+    return _generate_statistics(urls, host)
+
+
+def generate_global_statistics(host):
+    """
+    Generate statistics of all system
+    :param host: name of host from server
+    :return: a dictionary with the global statistics
+    """
+    urls = Url.query.order_by(Url.hits.desc()).all()
+    return _generate_statistics(urls, host)
+
