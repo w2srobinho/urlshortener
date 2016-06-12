@@ -1,22 +1,8 @@
 #!/bin/bash
 
-VIRTUALENV=`which pyvenv`
-APPDIR=$(dirname $(realpath "$0"))
-VIRTUALENV_ROOT="$APPDIR/env"
-
-if [ -z "$VIRTUALENV" ]; then
-    echo "Installing Python3.5"    
-    apt-get update
-    apt-get install python3.5 -y
-    VIRTUALENV=`which pyvenv`
-fi
-
-if [ ! -d $VIRTUALENV_ROOT ]; then
-    "$VIRTUALENV" "$VIRTUALENV_ROOT" > /dev/null
-fi
-
-source "$APPDIR/env/bin/activate"
-pip install -r "$APPDIR/requirements.txt"
+VIRTUALENV=`which virtualenv`
+BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+VIRTUALENV_ROOT="$BASEDIR/env"
 
 if [ -z "$POSTGRESQL_DATABASE" ]; then
     echo "The environment variable 'POSTGRESQL_DATABASE' not found or is empty."
@@ -27,4 +13,15 @@ if [ -z "$POSTGRESQL_DATABASE" ]; then
     exit -1
 fi
 
-python "$APPDIR/manager.py db upgrade"
+if [ -z "$VIRTUALENV" ]; then
+    echo "Installing virtualenv..."
+    apt-get update
+    apt-get install python-virtualenv -y
+fi
+
+# get include path for this python version
+INCLUDE_PY=$(python3 -c "from distutils import sysconfig as s; print s.get_config_vars()['INCLUDEPY']")
+if [ ! -f "${INCLUDE_PY}/Python.h" ]; then
+    apt-get install python3-dev -y
+fi
+

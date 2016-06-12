@@ -33,9 +33,9 @@ O lsistema usa o PostgreSQL como banco de dados. É necessário instalar e criar
 ##### Ubuntu
 
 * Definir a variavel de ambiente com o endereço do banco de dados:
-    `export POSTGRESQL_DATABASE=\"postgresql://<username>:<password>@<host>:<port>/<database_name>`
+    `export POSTGRESQL_DATABASE="postgresql://<username>:<password>@<host>:<port>/<database_name>`
 
-* Rodar o script `install.sh` para baixar as dependencias: `$ sh install.sh`
+* Rodar o script `install.sh` para baixar as dependencias: `$ sudo sh install.sh`
 * Rodar o script `start.sh` para iniciar o serviço: `$ sh start.sh`
 
 ##### Outros Unix like
